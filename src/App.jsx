@@ -1,13 +1,19 @@
-import React from 'react'
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./HomePage";
+import LoginPage from "./LoginPage";
+import SignupPage from "./SignupPage";
+import TaskForm from "./TaskForm";
 
 const App = () => {
   return (
-    <div>
-      <h1 class="text-3xl font-bold underline flex items-center justify-center">
-    Hello world!
-  </h1>
-    </div>
-  )
-}
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/taskform" element={<TaskForm />} />
+    </Routes>
+  );
+};
 
-export default App
+export default App;
