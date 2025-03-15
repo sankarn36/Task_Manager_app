@@ -127,7 +127,7 @@ const SideMenu = () => (
         Activity Tracking
       </a>
       <a
-        href="/team-collaboration"
+        href="/teams"
         className="block py-2 px-4 rounded-lg hover:bg-gray-700"
       >
         Teams
