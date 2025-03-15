@@ -26,38 +26,41 @@ const HomePage = () => {
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar Navigation */}
-      <div className="w-64 bg-gray-800 text-white flex flex-col">
+      <div className="w-64 bg-black text-white flex flex-col">
         <h1 className="text-3xl font-bold p-6 border-b border-gray-700">ZIDIO</h1>
         <nav className="flex-1 p-4 space-y-4">
-          <a href="#" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
+          <a href="/home" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
             Dashboard
           </a>
-          <a href="#" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
+          <a href="/taskform" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
             Create Task
           </a>
-          <a href="#" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
+          <a href="/alltasks" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
             All Tasks
+          </a>
+          <a href="/teams" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
+            Teams
           </a>
           <a href="#" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
             Activity Tracking
           </a>
-          <a href="#" className="block py-2 px-4 rounded-lg hover:bg-gray-700">
-            Teams
-          </a>
+         
         </nav>
       </div>
-
+    
+  
       {/* Main Content */}
       <div className="flex-1 p-10">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-gray-800">Task Management</h2>
           <button
-            onClick={addTask}
-            className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Task</span>
-          </button>
+          onClick={addTask}
+          className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+>
+          <Plus className="w-4 h-4" />
+         <span>Add Task</span>
+         </button>
+
         </div>
 
         {/* Task Input Form */}

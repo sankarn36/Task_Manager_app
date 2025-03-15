@@ -5,6 +5,7 @@ import LoginPage from "./LoginPage";
 import SignupPage from "./SignupPage";
 import TaskForm from "./TaskForm";
 import AllTasks from "./AllTasks"
+import TeamCollaboration from "./TeamCollaboration"
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/taskform" element={<TaskForm />} />
       <Route path="/alltasks" element={<AllTasks />} />
+      <Route path="/teams" element={<TeamCollaboration />} />
     </Routes>
   );
 };
