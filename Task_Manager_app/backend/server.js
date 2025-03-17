@@ -12,6 +12,7 @@ const app = express();
 // Middleware
 app.use(cors({ origin: "http://localhost:5173" })); // Allow frontend access
 app.use(express.json());
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes );
 app.use("/api/tasks", taskRoutes);

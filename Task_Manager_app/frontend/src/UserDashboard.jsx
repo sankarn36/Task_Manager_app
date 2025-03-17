@@ -6,6 +6,9 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("To Do");
+  const [filterStatus, setFilterStatus] = useState("To Do"); // Default filter
+
   const [user, setUser] = useState(null);
   const [newTask, setNewTask] = useState({
     title: "",
@@ -64,24 +67,25 @@ const UserDashboard = () => {
     if (!user?.id) return;
   
     try {
-      let imageUrl = "";
+      let image = "";
   
       // ✅ Upload image to Cloudinary if file exists
       if (newTask.image) {
         const formData = new FormData();
         formData.append("file", newTask.image);
-        formData.append("upload_preset", "sshevytu"); // ✅ Make sure this matches Cloudinary
+        formData.append("upload_preset", "sshevytu");
+      
         try {
-          console.log("📤 Uploading image to Cloudinary...");
+          console.log("📤 Uploading image...");
           const res = await axios.post("https://api.cloudinary.com/v1_1/dbwgvmbm2/image/upload", formData);
-          console.log("cloudinary response:", res.data);
-          imageUrl = res.data.secure_url;
-          console.log("✅ Image uploaded successfully:", imageUrl);
+          image = res.data.secure_url;
+          console.log("✅ Image uploaded:", image);
         } catch (error) {
-          console.error("❌ Error uploading image:", error.response?.data || error);
+          console.error("❌ Image upload failed:", error.response?.data || error);
           return;
         }
       }
+      
   
       // ✅ Prepare task data
       const taskData = {
@@ -90,7 +94,7 @@ const UserDashboard = () => {
         priority: newTask.priority,
         endDate: newTask.endDate,
         status: newTask.status,
-        image: imageUrl || "", // ✅ Set image URL if available
+        image: image || "", // ✅ Set image URL if available
         userId: user.id,
       };
   
@@ -101,7 +105,8 @@ const UserDashboard = () => {
       console.log("✅ Task added successfully:", response.data);
   
       // ✅ Update UI with new task
-      setTasks([...tasks, response.data.task]);
+      setTasks((prevTasks) => [...prevTasks, response.data.task]);
+
       setNewTask({ title: "", description: "", priority: "Low",  endDate: "", status: "To Do", image: null });
       setShowModal(false);
     } catch (error) {
@@ -122,6 +127,31 @@ const UserDashboard = () => {
       setTasks(tasks.filter((task) => task._id !== taskId));
     } catch (error) {
       console.error("Error deleting task:", error);
+    }
+  };
+  
+  const handleStatusChange = async (task, newStatus) => {
+     
+  
+    if (!task || !task._id) {
+      console.error("❌ Error: Task ID is missing!");
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem("token");
+
+      console.log("sending update request for task:", task._id);
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/update/${task._id}`, // 🔹 Ensure task._id exists
+        { status:  newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      console.log("✅ Task updated:", response.data);
+      fetchTasks(); // Refresh tasks
+    } catch (error) {
+      console.error("❌ Error updating status:", error);
     }
   };
   
@@ -163,38 +193,67 @@ const UserDashboard = () => {
             + Add Task
           </button>
         </div>
-        {tasks.length ? (
-  tasks.map((task) => (
-    <div key={task._id.toString()} className="w-1/2 p-2 mb-4 bg-gray-800 shadow-lg rounded-lg">
-      <h3 className="text-xl font-bold">{task.title}</h3>
-      <p>{task.description}</p>
-      <p>Priority: <span className="font-semibold">{task.priority}</span></p>
-      <p>
-        Status: <span className="font-semibold">  {task.status}</span>
-      </p>
-      <p>
-        Due Date: {new Date(task.endDate).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>
-      
-      {task.image && (
-        <img src={task.image} alt="Task" className="w-full h-40 object-cover rounded-lg mt-2" />
-      )}
-      <div className="mt-3 flex space-x-2">
-               
-                <button onClick={() => handleDeleteTask(task._id)} className="bg-gray-500 px-4 py-2 rounded">
-                  Delete
-                </button>
-              </div>
+
+        <div className="flex flex-col items-center">
     
+    {/* Filter Buttons */}
+    <div className="flex space-x-4 mb-6">
+      <button onClick={() => setFilterStatus("To Do")} className={`px-4 py-2 rounded ${filterStatus === "To Do" ? "bg-blue-500" : "bg-gray-700"}`}>
+        To Do
+      </button>
+      <button onClick={() => setFilterStatus("In Progress")} className={`px-4 py-2 rounded ${filterStatus === "In Progress" ? "bg-yellow-500" : "bg-gray-700"}`}>
+        In Progress
+      </button>
+      <button onClick={() => setFilterStatus("Completed")} className={`px-4 py-2 rounded ${filterStatus === "Completed" ? "bg-green-500" : "bg-gray-700"}`}>
+        Completed
+      </button>
     </div>
-  ))
-) : (
-  <p>No tasks found.</p>
-)}
+
+    {/* Display Tasks Based on Selected Status */}
+    {tasks.filter(task => task.status === filterStatus).length ? (
+      tasks
+        .filter(task => task.status === filterStatus)
+        .map((task) => (
+          <div key={task._id.toString()} className="w-1/2 p-4 mb-4 bg-gray-800 shadow-lg rounded-lg">
+            <h3 className="text-xl font-bold">{task.title}</h3>
+            <p>{task.description}</p>
+            <p>Priority: <span className="font-semibold">{task.priority}</span></p>
+            
+            {/* Status Dropdown */}
+            <p>
+              Status:
+              <select
+                value={task.status}
+                onChange={(e) => handleStatusChange(task, e.target.value)}
+                className="ml-2 bg-gray-800 text-white border p-1 rounded"
+              >
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </p>
+
+            <p>Due Date: {new Date(task.endDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+            
+            {/* Image Display */}
+            {task.image && (
+              <img src={task.image} alt="Task" className="w-full h-40 object-cover rounded-lg mt-2" />
+            )}
+            
+            {/* Delete Button */}
+            <div className="mt-3 flex space-x-2">
+              <button onClick={() => handleDeleteTask(task._id)} className="bg-gray-500 px-4 py-2 rounded">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+    ) : (
+      <p>No tasks found.</p>
+    )}
+  </div>
+
+        
 
       </div>
       {showModal && (

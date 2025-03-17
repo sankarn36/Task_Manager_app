@@ -1,12 +1,17 @@
 import express from "express";
-import { createTask, getAllAdminTasks } from "../controllers/adminController.js";
+import { createAdminTask, getAllAdminTasks, getAllUsers } from "../controllers/adminController.js";
+import { getUserTasks } from "../controllers/taskController.js";
+import { upload } from "../middleware/multerMiddleware.js";
 
 const router = express.Router();
 
-// Route to create a task and assign it to a user
-router.post("/tasks/create", createTask);
+
+
+router.post("/tasks/create", upload.single("image"), createAdminTask); 
 
 // Route to get all admin-created tasks
 router.get("/tasks", getAllAdminTasks);
+router.get("/all-tasks", getUserTasks);
+router.get("/users", getAllUsers);
 
 export default router;
